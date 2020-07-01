@@ -1,0 +1,48 @@
+body {
+  border: solid 1px;
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.2);
+  margin: 0px auto;
+  overflow: hidden;
+}
+
+.App {
+  text-align: right;
+  font-family: 'UD デジタル 教科書体 NK-B', 'メイリオ', 'ＭＳ Ｐゴシック', sans-serif;
+  font-size: 24px;
+  text-shadow: 1px 1px 0 #333, -1px 1px 0 #333, 1px -1px 0 #333, -1px -1px 0 #333;
+}
+
+.updateTime {
+  font-size: smaller;
+  color: aliceblue;
+}
+
+/* 順位一行分 */
+.rank {
+  display: flex;
+  text-align: right;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 順位ラベル */
+.rankValue {
+  width: 4em;
+  margin-right: 20px;
+  color: aliceblue;
+}
+
+.borderValue {
+  width: 7em;
+  color: darkorange;
+}
+
+.borderDiff {
+  display: flex;
+}
+
+.borderDiffValue {
+  width: 7em;
+  font-size: smaller;
+  color: darkturquoise;
+}
