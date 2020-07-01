@@ -100,9 +100,12 @@ const App: React.SFC = () => {
 
   // 定期取得
   useInterval(() => {
+    console.log(new Date());
     const result = fetchEventList(eventId, idolId, rankList);
     result.then(data => {
       setList(data);
+      const summary = data[data.length - 1].data[data[data.length - 1].data.length - 1].summaryTime;
+      setLatestTime(summary);
     });
     // 10分ごと
   }, 10 * 60 * 1000);
