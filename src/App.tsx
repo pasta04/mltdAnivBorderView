@@ -172,8 +172,8 @@ const App: React.SFC = () => {
       const summary = data[data.length - 1].data[data[data.length - 1].data.length - 1].summaryTime;
       setLatestTime(summary);
     });
-    // 10分ごと
-  }, 10 * 60 * 1000);
+    // 5分ごと
+  }, 5 * 60 * 1000);
 
   return (
     <div className="App">
