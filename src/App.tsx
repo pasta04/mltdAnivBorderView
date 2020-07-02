@@ -15,6 +15,62 @@ type MatsuriEventRankingIdolPoint = {
   }[];
 };
 
+const idolList = [
+  '天海春香',
+  '如月千早',
+  '星井美希',
+  '萩原雪歩',
+  '高槻やよい',
+  '菊地真',
+  '水瀬伊織',
+  '四条貴音',
+  '秋月律子',
+  '三浦あずさ',
+  '双海亜美',
+  '双海真美',
+  '我那覇響',
+  '春日未来',
+  '最上静香',
+  '伊吹翼',
+  '田中琴葉',
+  '島原エレナ',
+  '佐竹美奈子',
+  '所恵美',
+  '徳川まつり',
+  '箱崎星梨花',
+  '野々原茜',
+  '望月杏奈',
+  'ロコ',
+  '七尾百合子',
+  '高山紗代子',
+  '松田亜利沙',
+  '高坂海美',
+  '中谷育',
+  '天空橋朋花',
+  'エミリー',
+  '北沢志保',
+  '舞浜歩',
+  '木下ひなた',
+  '矢吹可奈',
+  '横山奈緒',
+  '二階堂千鶴',
+  '馬場このみ',
+  '大神環',
+  '豊川風花',
+  '宮尾美也',
+  '福田のり子',
+  '真壁瑞希',
+  '篠宮可憐',
+  '百瀬莉緒',
+  '永吉昴',
+  '北上麗花',
+  '周防桃子',
+  'ジュリア',
+  '白石紬',
+  '桜守歌織',
+];
+// 詩花は201, 玲音は202
+
 async function fetchJson<T>(url: string): Promise<T> {
   const result = await fetch(url);
   const json = await result.json();
@@ -54,18 +110,21 @@ const App: React.SFC = () => {
   const [idolId, setIdolId] = React.useState<number>(0);
   const [eventId, setEventId] = React.useState<number>(0);
   const [rankList, setRankList] = React.useState<number[]>([]);
-  const [latestTime, setLatestTime] = React.useState<string>();
+  const [latestTime, setLatestTime] = React.useState<string>('');
+  const [diffList, setDiffList] = React.useState<number[]>([]);
 
   React.useEffect(() => {
     // クエリ情報を取得
     let idol = 35;
     let event = 142;
     let rank = [1, 10, 50, 80, 100];
+    let diff: number[] = [1, 6, 24];
     if (window.location.search) {
       const parsed = queryString.parse(window.location.search) as {
         idol: string;
         event: string;
         rank: string;
+        diff: string;
       };
       // アイドルID
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -80,12 +139,18 @@ const App: React.SFC = () => {
       // 取得対象の順位
       if (parsed.rank && parsed.rank.match(/^[\d|,]+$/)) {
         temp = parsed.rank.split(',');
-        rank = temp;
+        rank = temp.map((i: string) => Number(i));
+      }
+      // 前回からの差分
+      if (parsed.diff && parsed.diff.match(/^[\d|,]+$/)) {
+        temp = parsed.diff.split(',');
+        diff = temp.map((i: string) => Number(i));
       }
     }
     setIdolId(idol);
     setEventId(event);
     setRankList(rank);
+    setDiffList(diff);
 
     // イベント取得
     const result = fetchEventList(event, idol, rank);
@@ -114,6 +179,7 @@ const App: React.SFC = () => {
     <div className="App">
       {/* ヘッダ */}
       <div className="header">
+        <div className="idolName">{idolList[idolId - 1]}</div>
         <div className="updateTime">update: {latestTime}</div>
       </div>
 
@@ -125,9 +191,9 @@ const App: React.SFC = () => {
         <div className="borderValue"></div>
         {/* 差分 */}
         <div className="borderDiff">
-          <div className="borderDiffValue">1h</div>
-          <div className="borderDiffValue">6h</div>
-          <div className="borderDiffValue">12h</div>
+          {diffList.map(diff => (
+            <div className="borderDiffValue">{diff}h</div>
+          ))}
         </div>
       </div>
 
@@ -137,7 +203,7 @@ const App: React.SFC = () => {
         const latestTime = new Date(rankData.data[rankData.data.length - 1].summaryTime).getTime();
 
         // N時間前
-        const agoList = [1, 6, 12];
+        const agoList = diffList;
         const agoData = [];
         for (const agoHour of agoList) {
           // 1時間前算出

@@ -5,8 +5,21 @@
   text-shadow: 1px 1px 0 #333, -1px 1px 0 #333, 1px -1px 0 #333, -1px -1px 0 #333;
 }
 
+.header {
+  text-align: left;
+  margin-left: 1em;
+  display: flex;
+  align-items: center;
+}
+
+.idolName {
+  color: red;
+  font-size: xx-large;
+}
+
 .updateTime {
-  font-size: smaller;
+  margin-left: 200px;
+  font-size: 13px;
   color: aliceblue;
 }
 
