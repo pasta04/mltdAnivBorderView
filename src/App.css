@@ -8,6 +8,14 @@
 .header {
   text-align: left;
   margin-left: 1em;
+  align-items: center;
+}
+
+.eventName {
+  color: aliceblue;
+}
+
+.subHeader {
   display: flex;
   align-items: center;
 }

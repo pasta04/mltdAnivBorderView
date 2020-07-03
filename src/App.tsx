@@ -15,6 +15,20 @@ type MatsuriEventRankingIdolPoint = {
   }[];
 };
 
+type MatsuriEventInfo = {
+  id: number;
+  name: string;
+  type: number;
+  schedule: {
+    beginDate: string;
+    endDate: string;
+    pageBeginDate: string;
+    pageEndDate: string;
+    boostBeginDate: string;
+    boostEndDate: string;
+  };
+};
+
 const idolList = [
   '天海春香',
   '如月千早',
@@ -88,8 +102,14 @@ const formatDate = (date: Date, format: string): string => {
   return format;
 };
 
-const fetchEventList = async (eventId: number, idolId: number, rankList: number[]): Promise<MatsuriEventRankingIdolPointList> => {
-  const url = `${API_BASE}events/${eventId}/rankings/logs/idolPoint/${idolId}/${rankList.join(',')}`;
+const fetchEventList = async (eventType: number, eventId: number, rankList: number[], idolId?: number): Promise<MatsuriEventRankingIdolPointList> => {
+  let url: string;
+  if (eventType === 5) {
+    url = `${API_BASE}events/${eventId}/rankings/logs/idolPoint/${idolId}/${rankList.join(',')}?prettyPrint=false`;
+  } else {
+    url = `${API_BASE}events/${eventId}/rankings/logs/eventPoint/${rankList.join(',')}?prettyPrint=false`;
+  }
+  console.log(url);
   let result = await fetchJson<MatsuriEventRankingIdolPointList>(url);
   result = result.map(rank => {
     return {
@@ -105,6 +125,12 @@ const fetchEventList = async (eventId: number, idolId: number, rankList: number[
   return result;
 };
 
+const fetchEventInfo = async (eventId: number): Promise<MatsuriEventInfo> => {
+  const url = `${API_BASE}events/${eventId}?prettyPrint=false`;
+  const result = await fetchJson<MatsuriEventInfo>(url);
+  return result;
+};
+
 const App: React.SFC = () => {
   const [list, setList] = React.useState<MatsuriEventRankingIdolPointList>([]);
   const [idolId, setIdolId] = React.useState<number>(0);
@@ -112,6 +138,8 @@ const App: React.SFC = () => {
   const [rankList, setRankList] = React.useState<number[]>([]);
   const [latestTime, setLatestTime] = React.useState<string>('');
   const [diffList, setDiffList] = React.useState<number[]>([]);
+  const [eventType, setEventType] = React.useState<number>(0);
+  const [eventTitle, setEventTitle] = React.useState<string>('');
 
   React.useEffect(() => {
     // クエリ情報を取得
@@ -125,6 +153,7 @@ const App: React.SFC = () => {
         event: string;
         rank: string;
         diff: string;
+        idolRank: string;
       };
       // アイドルID
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -152,21 +181,27 @@ const App: React.SFC = () => {
     setRankList(rank);
     setDiffList(diff);
 
-    // イベント取得
-    const result = fetchEventList(event, idol, rank);
-    result.then(data => {
-      if (data.length > 0) {
-        setList(data);
-        const summary = data[data.length - 1].data[data[data.length - 1].data.length - 1].summaryTime;
-        setLatestTime(summary);
-      }
+    // イベントタイトル取得
+    fetchEventInfo(event).then(info => {
+      setEventTitle(info.name);
+      setEventType(info.type);
+
+      // イベント取得
+      const result = fetchEventList(info.type, event, rank, idol);
+      result.then(data => {
+        if (data.length > 0) {
+          setList(data);
+          const summary = data[data.length - 1].data[data[data.length - 1].data.length - 1].summaryTime;
+          setLatestTime(summary);
+        }
+      });
     });
   }, []);
 
   // 定期取得
   useInterval(() => {
     console.log(new Date());
-    const result = fetchEventList(eventId, idolId, rankList);
+    const result = fetchEventList(eventType, eventId, rankList, idolId);
     result.then(data => {
       setList(data);
       const summary = data[data.length - 1].data[data[data.length - 1].data.length - 1].summaryTime;
@@ -179,8 +214,11 @@ const App: React.SFC = () => {
     <div className="App">
       {/* ヘッダ */}
       <div className="header">
-        <div className="idolName">{idolList[idolId - 1]}</div>
-        <div className="updateTime">update: {latestTime}</div>
+        <div className="eventName">{eventTitle}</div>
+        <div className="subHeader">
+          <div className="idolName">{eventType === 5 && idolList[idolId - 1]}</div>
+          <div className="updateTime">update: {latestTime}</div>
+        </div>
       </div>
 
       {/* データ */}
@@ -211,8 +249,8 @@ const App: React.SFC = () => {
           const hourAgoData = rankData.data.filter(data => {
             return new Date(data.summaryTime).getTime() === hourAgo;
           });
-          const hourAgoDiff = hourAgoData ? latestScore - hourAgoData[0].score : NaN;
-          if (!Number.isNaN(hourAgoDiff)) agoData.push(hourAgoDiff);
+          const hourAgoDiff = hourAgoData.length > 0 ? `+${latestScore - hourAgoData[0].score} pts` : '-';
+          agoData.push(hourAgoDiff);
         }
 
         return (
@@ -224,7 +262,7 @@ const App: React.SFC = () => {
             {/* 差分 */}
             <div className="borderDiff">
               {agoData.map(data => (
-                <div className="borderDiffValue">{`+${data} pts`}</div>
+                <div className="borderDiffValue">{`${data}`}</div>
               ))}
             </div>
           </div>
