@@ -16,5 +16,4 @@
 - データは30分ごとに更新。データの取得元が集計中だったりすると画面反映が少し遅れることがある。
 
 # データ取得元
-- matsurihi.me
-  https://www.matsurihi.me/
+- [matsurihi.me](https://www.matsurihi.me/)
