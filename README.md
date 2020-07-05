@@ -15,5 +15,17 @@
 
 - データは30分ごとに更新。データの取得元が集計中だったりすると画面反映が少し遅れることがある。
 
+# OBSカスタムCSS参考
+```.css
+body {
+    padding: 10px;
+    border: solid 1px;
+    border-radius: 5px;
+    background-color: rgba(0,0,0, 0.7);
+    margin: 0px auto;
+    overflow: hidden;
+}
+```
+
 # データ取得元
 - [matsurihi.me](https://www.matsurihi.me/)
