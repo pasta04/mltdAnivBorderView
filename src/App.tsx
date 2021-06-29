@@ -144,8 +144,8 @@ const App: React.SFC = () => {
   React.useEffect(() => {
     // クエリ情報を取得
     let idol = 35;
-    let event = 142;
-    let rank = [1, 10, 50, 80, 100];
+    let event = 192;
+    let rank = [1, 10, 50, 80, 100, 200];
     let diff: number[] = [1, 6, 24];
     if (window.location.search) {
       const parsed = queryString.parse(window.location.search) as {
@@ -212,6 +212,7 @@ const App: React.SFC = () => {
 
   return (
     <div className="App">
+      <div className={'SW-update-dialog'} />
       {/* ヘッダ */}
       <div className="header">
         <div className="eventName">{eventTitle}</div>
