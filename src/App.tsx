@@ -143,10 +143,10 @@ const App: React.SFC = () => {
 
   React.useEffect(() => {
     // クエリ情報を取得
-    let idol = 35;
-    let event = 192;
-    let rank = [1, 10, 50, 80, 100, 200];
-    let diff: number[] = [1, 6, 24];
+    let idol = NaN;
+    let event = NaN;
+    let rank: number[] = [];
+    let diff: number[] = [];
     if (window.location.search) {
       const parsed = queryString.parse(window.location.search) as {
         idol: string;
@@ -160,22 +160,66 @@ const App: React.SFC = () => {
       let temp: any;
       if (parsed.idol && parsed.idol.match(/^\d+$/)) {
         idol = Number(parsed.idol);
+
+        localStorage.setItem('idol', idol.toString());
       }
       // イベントID
       if (parsed.event && parsed.event.match(/^\d+$/)) {
         event = Number(parsed.event);
+        localStorage.setItem('event', event.toString());
       }
       // 取得対象の順位
       if (parsed.rank && parsed.rank.match(/^[\d|,]+$/)) {
         temp = parsed.rank.split(',');
         rank = temp.map((i: string) => Number(i));
+
+        localStorage.setItem('rank', parsed.rank.toString());
       }
       // 前回からの差分
       if (parsed.diff && parsed.diff.match(/^[\d|,]+$/)) {
         temp = parsed.diff.split(',');
         diff = temp.map((i: string) => Number(i));
+
+        localStorage.setItem('diff', parsed.diff.toString());
       }
     }
+
+    // LocalStorageからロード
+    if (!idol) {
+      const result = localStorage.getItem('idol');
+      if (result) {
+        idol = parseInt(result);
+      } else {
+        idol = 35; // ひなた
+      }
+    }
+    if (!event) {
+      const result = localStorage.getItem('event');
+      if (result) {
+        event = parseInt(result);
+      } else {
+        event = 192; // 4周年
+      }
+    }
+    if (rank.length === 0) {
+      const result = localStorage.getItem('rank');
+      if (result) {
+        const temp = result.split(',');
+        rank = temp.map((i: string) => Number(i));
+      } else {
+        rank = [1, 10, 50, 80, 100, 200];
+      }
+    }
+    if (diff.length === 0) {
+      const result = localStorage.getItem('diff');
+      if (result) {
+        const temp = result.split(',');
+        diff = temp.map((i: string) => Number(i));
+      } else {
+        diff = [1, 6, 24];
+      }
+    }
+
     setIdolId(idol);
     setEventId(event);
     setRankList(rank);
